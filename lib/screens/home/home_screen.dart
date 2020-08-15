@@ -52,7 +52,8 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
           context: context,
           barrierDismissible: false,
           builder: (BuildContext dialogContext) {
-            Future.delayed(Duration(seconds: 2), ()=> Navigator.of(context).pop());
+            Future.delayed(
+                Duration(seconds: 2), () => Navigator.of(context).pop());
             return Stack(
               alignment: AlignmentDirectional.center,
               children: <Widget>[
@@ -339,80 +340,55 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
             children: <Widget>[
               Image.asset('assets/images/man.png'),
               Container(
-                width: _screenSize.width * 0.55,
+                width: _screenSize.width * 0.6,
                 height: 90,
-                padding: EdgeInsets.all(5),
+                padding: EdgeInsets.symmetric(vertical: 5),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Stack(
-                  alignment: AlignmentDirectional.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Positioned(
-                      top: 0,
-                      left: 2,
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        child: FlareActor(
-                          'assets/animation/bulb.flr',
-                          animation: 'Loop',
-                          fit: BoxFit.contain,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(width: 5),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          child: FlareActor(
+                            'assets/animation/bulb.flr',
+                            animation: 'Loop',
+                            fit: BoxFit.contain,
+                          ),
                         ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 8,
-                      left: 33,
-                      child: Text(
-                        tr('tip_question'),
-                        style: GoogleFonts.montserrat(
-                          color: Color(0xFF0E0B87),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          tr('tip_question'),
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFF0E0B87),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                    Positioned(
-                      left: 13,
-                      top: 32,
-                      child: Container(
-                        width: 210,
-                        height: 40,
-                        child: Swiper(
-                          itemCount: 3,
-                          autoplay: true,
-                          loop: true,
-                          itemBuilder: (context, index) => Text(
-                            tr('tip$index'),
-                            style: GoogleFonts.montserrat(
-                              color: Color(0xFF0E0B87),
-                              fontSize: 14,
-                            ),
+                    Container(
+                      width: 210,
+                      height: 40,
+                      child: Swiper(
+                        itemCount: 3,
+                        autoplay: true,
+                        loop: true,
+                        itemBuilder: (context, index) => Text(
+                          tr('tip$index'),
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFF0E0B87),
+                            fontSize: 14,
                           ),
                         ),
                       ),
                     ),
-//                    Positioned(
-//                      bottom: 0,
-//                      child: SizedBox(
-//                        width: 35,
-//                        child: Row(
-//                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                          children: List<Widget>.generate(
-//                            3,
-//                            (index) => CircleAvatar(
-//                              minRadius: 4,
-//                              maxRadius: 4,
-//                              backgroundColor: _currentIndex == index
-//                                  ? UIColors.purple
-//                                  : Colors.grey[300],
-//                            ),
-//                          ),
-//                        ),
-//                      ),
-//                    )
                   ],
                 ),
               )
