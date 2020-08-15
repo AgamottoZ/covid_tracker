@@ -24,13 +24,11 @@ class HomeBloc {
   }
 
   Future getGlobalStats() async {
-    await _env.setCountrySelection(GLOBAL_COUNTRY_CODE);
     return repository.getGlobalStats()
       ..then((data) => _statSubject.add(data.data));
   }
 
   Future getCountryStats(String countryCode) async {
-    await _env.setCountrySelection(countryCode);
     return repository.getCountryStats(countryCode)
       ..then((data) => _statSubject.add(data.data));
   }

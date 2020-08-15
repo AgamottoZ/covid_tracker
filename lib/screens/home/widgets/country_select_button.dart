@@ -46,7 +46,6 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
         initialItem: countryList.indexOf(countryList.firstWhere(
             (element) => element.isoCode == _selectedCountryCode,
             orElse: () => null)));
-
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => _onTapButton(),
@@ -112,8 +111,8 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
                 useMagnifier: true,
                 magnification: 1.3,
                 controller: _scrollController,
-                onSelectedItemChanged: (index) =>
-                    _selectedCountryCode = countryList[index].isoCode,
+                onSelectedItemChanged: (index) => setState(
+                    () => _selectedCountryCode = countryList[index].isoCode),
                 children: List<Widget>.generate(
                   countryList.length,
                   (index) => Container(
@@ -132,7 +131,8 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
               ),
             ),
             GestureDetector(
-              onTap: () {
+              onTap: () async {
+                await _env.setCountrySelection(_selectedCountryCode);
                 if (_selectedCountryCode == GLOBAL_COUNTRY_CODE) {
                   _homeBloc.getGlobalStats();
                 } else {

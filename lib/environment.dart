@@ -39,11 +39,13 @@ class Environment {
   setTheme(bool lightTheme) async {
     _isLight = lightTheme;
     await _sharedPrefs.setBool(THEME_KEY, lightTheme);
+    getConfig();
   }
 
   setLocale(bool isVnese) async {
     _isVnese = isVnese;
     await _sharedPrefs.setBool(LOCALE_KEY, isVnese);
+    getConfig();
   }
 
   setCountrySelection(String countryCode) async {
