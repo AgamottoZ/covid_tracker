@@ -44,6 +44,42 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
     'assets/images/fatal.png'
   ];
 
+  _startTimer() async {
+    if (mounted)
+      await Future.delayed(
+        Duration(seconds: 2),
+        () => showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) {
+            Future.delayed(Duration(seconds: 2), ()=> Navigator.of(context).pop());
+            return Stack(
+              alignment: AlignmentDirectional.center,
+              children: <Widget>[
+                Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    color: Colors.transparent,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Icon(Icons.arrow_back, color: Colors.white, size: 50),
+                        Text(
+                          "Swipe for more data",
+                          style: GoogleFonts.montserrat(
+                              color: Colors.white, fontSize: 30),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            );
+          },
+        ),
+      );
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -67,6 +103,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
 
   @override
   Widget build(BuildContext context) {
+    _startTimer();
     logger.v(context.locale.languageCode);
     return Material(
       child: RefreshIndicator(
@@ -151,27 +188,25 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
 
   Widget _buildStatistics() {
     return Container(
-        width: _screenSize.width,
-        height: _screenSize.height * 0.47,
-        child:
-//      Swiper(
-//        itemCount: 3,
-//        itemBuilder: (context, index) {
-//          switch (index) {
-//            case 0:
-//              return _buildGeneralStats();
-//            case 1:
-//              return
-            _buildCharts()
-//            case 2:
-//            default:
-//              return Container(
-//                color: UIColors.green,
-//              );
-//          }
-//        },
-//      ),
-        );
+      width: _screenSize.width,
+      height: _screenSize.height * 0.47,
+      child: Swiper(
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return _buildGeneralStats();
+            case 1:
+              return _buildCharts();
+            case 2:
+            default:
+              return Container(
+                color: UIColors.green,
+              );
+          }
+        },
+      ),
+    );
   }
 
   _buildGeneralStats() {
@@ -290,7 +325,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
     return Container(
       width: _screenSize.width,
       child: Stack(
-        alignment: AlignmentDirectional.bottomCenter,
+        alignment: AlignmentDirectional.center,
         children: <Widget>[
           Container(
             width: _screenSize.width,
