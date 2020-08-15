@@ -132,28 +132,28 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
         children: <Widget>[
           Container(
             width: _screenSize.width,
-            height: _screenSize.height * 0.33,
+            height: _screenSize.height * 0.3,
             child: CustomPaint(
               painter: CurvePainter(),
             ),
           ),
-          Positioned(
-            left: 30,
-            top: 60,
-            child: _buildBannerText(),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildBannerText(),
+                Image.asset('assets/images/top_banner.png'),
+              ],
+            ),
           ),
           Positioned(
             top: 35,
-            right: 10,
-            child: Image.asset('assets/images/top_banner.png'),
-          ),
-          Positioned(
-            top: 30,
             right: 5,
             child: LanguageButton(),
           ),
           Positioned(
-            top: _screenSize.height * 0.26,
+            top: _screenSize.height * 0.24,
             left: _screenSize.width / 2 - 50,
             child: CountrySelectButton(),
           )
@@ -165,6 +165,8 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   Container _buildBannerText() {
     return Container(
       width: _screenSize.width * 0.5,
+      height: 100,
+      alignment: Alignment.center,
       child: RichText(
         text: TextSpan(
           style: GoogleFonts.montserrat(fontSize: 28, color: Colors.white),
@@ -193,6 +195,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
       height: _screenSize.height * 0.47,
       child: Swiper(
         itemCount: 3,
+        loop: false,
         itemBuilder: (context, index) {
           switch (index) {
             case 0:
@@ -222,7 +225,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
         return Container(
           child: ListView.builder(
               physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 50),
+              padding: EdgeInsets.symmetric(horizontal: 45),
               shrinkWrap: true,
               itemCount: _titles.length,
               itemBuilder: (context, index) {

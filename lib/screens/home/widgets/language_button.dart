@@ -22,6 +22,7 @@ class _LanguageButtonState extends State<LanguageButton> {
     );
 
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () {
         showModalBottomSheet(
           context: context,
@@ -55,8 +56,8 @@ class _LanguageButtonState extends State<LanguageButton> {
         );
       },
       child: Container(
-        width: 45,
-        height: 25,
+        width: 50,
+        height: 28,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
