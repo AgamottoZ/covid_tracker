@@ -49,7 +49,7 @@ class BottomCurvePainter extends CustomPainter {
     path.quadraticBezierTo(
         size.width * 0.25, -10, size.width / 2, size.height * 0.08);
     path.quadraticBezierTo(
-        size.width * 0.75, size.height * 0.25, size.width, size.height * 0.08);
+        size.width * 0.75, size.height * 0.2, size.width, size.height * 0.05);
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
 
