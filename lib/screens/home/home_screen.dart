@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:covid_tracker/color.dart';
 import 'package:covid_tracker/injection.dart';
 import 'package:covid_tracker/models/daily_stats.dart';
+import 'package:covid_tracker/models/models.dart';
+import 'package:covid_tracker/models/response_result.dart';
 import 'package:covid_tracker/models/stats.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +31,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   HomeBloc _homeBloc;
   final _env = getIt.get<Environment>();
+  bool _isVnese = false;
 
   StreamSubscription _subCurrentTab;
   Size _screenSize;
@@ -116,6 +119,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   @override
   Widget build(BuildContext context) {
     logger.v(context.locale.languageCode);
+    _isVnese = context.locale.languageCode == LOCALES.first;
     return Material(
       child: RefreshIndicator(
         onRefresh: _onRefresh,
@@ -176,15 +180,14 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
     return Container(
       width: _screenSize.width * 0.5,
       height: 100,
-      padding: EdgeInsets.only(
-          left: (context.locale.languageCode != LOCALES.first) ? 0 : 10),
+      padding: EdgeInsets.only(left: _isVnese ? 10 : 0),
       alignment: Alignment.center,
       child: RichText(
         text: TextSpan(
           style: GoogleFonts.montserrat(fontSize: 28, color: Colors.white),
           children: [
             TextSpan(text: tr('slogan')),
-            if (context.locale.languageCode != LOCALES.first)
+            if (!_isVnese)
               TextSpan(
                 text: 'Together.',
                 style: GoogleFonts.montserrat(
@@ -425,22 +428,33 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                         ),
                       ],
                     ),
-                    Container(
-                      width: 210,
-                      height: 40,
-                      padding: EdgeInsets.only(left: 5),
-                      child: Swiper(
-                        itemCount: 3,
-                        autoplay: true,
-                        loop: true,
-                        itemBuilder: (context, index) => Text(
-                          tr('tip$index'),
-                          style: GoogleFonts.montserrat(
-                            color: Color(0xFF0E0B87),
-                            fontSize: 14,
+                    FutureBuilder<ResponseResult<List<Tip>>>(
+                      future: _homeBloc.getHomeTips(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Container();
+                        }
+                        var _tips = snapshot.data.data;
+                        return Container(
+                          width: 210,
+                          height: 40,
+                          padding: EdgeInsets.only(left: 5),
+                          child: Swiper(
+                            itemCount: _tips.length,
+                            autoplay: true,
+                            loop: true,
+                            itemBuilder: (context, index) => Text(
+                              _isVnese
+                                  ? _tips[index].text ?? ''
+                                  : _tips[index].textEn ?? '',
+                              style: GoogleFonts.montserrat(
+                                color: Color(0xFF0E0B87),
+                                fontSize: 14,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -452,13 +466,15 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
     );
   }
 
-  Future<void> _onRefresh() async {}
+  Future<void> _onRefresh() async {
+    if (_env.selectedCountryCode == GLOBAL_COUNTRY_CODE) {
+      _homeBloc.getGlobalStats();
+      _homeBloc.getGlobalTimeline();
+    } else {
+      _homeBloc.getCountryStats(_env.selectedCountryCode);
+      _homeBloc.getCountryTimeline(_env.selectedCountryCode3);
+    }
+  }
 }
 
-/// Sample ordinal data type.
-class OrdinalSales {
-  final String year;
-  final int sales;
-
-  OrdinalSales(this.year, this.sales);
-}
+/// Sample

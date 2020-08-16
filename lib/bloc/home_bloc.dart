@@ -45,4 +45,8 @@ class HomeBloc {
     return repository.getCountryTimeline(countryCode3)
       ..then((data) => _timelineSubject.add(data.data));
   }
+
+  Future<ResponseResult<List<Tip>>> getHomeTips() async {
+    return repository.getHomeTips();
+  }
 }
