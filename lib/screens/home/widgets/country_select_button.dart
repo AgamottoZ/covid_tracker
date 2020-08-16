@@ -25,6 +25,7 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
   @override
   void initState() {
     _selectedCountryCode = _env.selectedCountryCode;
+    _selectedCountryCode3 = _env.selectedCountryCode3;
     super.initState();
   }
 
@@ -135,11 +136,12 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
             ),
             GestureDetector(
               onTap: () async {
+                await _env.setCountrySelection(
+                    _selectedCountryCode, _selectedCountryCode3);
                 if (_selectedCountryCode == GLOBAL_COUNTRY_CODE) {
                   _homeBloc.getGlobalStats();
                   _homeBloc.getGlobalTimeline();
                 } else {
-                  print(_selectedCountryCode3);
                   _homeBloc.getCountryStats(_selectedCountryCode);
                   _homeBloc.getCountryTimeline(_selectedCountryCode3);
                 }

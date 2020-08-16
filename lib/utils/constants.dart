@@ -8,6 +8,7 @@ const RECEIVE_TIMEOUT = 3000;
 const THEME_KEY = 'lightTheme';
 const LOCALE_KEY = 'isVnese';
 const COUNTRY_CODE_KEY = 'countryCode';
+const COUNTRY_CODE3_KEY = 'countryCode3';
 //const TEXT_SCALE_KEY = 'textScale';
 const FONT_FAMILY = 'Montserrat';
 

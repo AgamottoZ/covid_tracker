@@ -93,12 +93,14 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     _homeBloc = Provider.of<HomeBloc>(context);
     if (_env.selectedCountryCode == GLOBAL_COUNTRY_CODE) {
       _homeBloc.getGlobalStats();
       _homeBloc.getGlobalTimeline();
     } else {
       _homeBloc.getCountryStats(_env.selectedCountryCode);
+      _homeBloc.getCountryTimeline(_env.selectedCountryCode3);
     }
     _screenSize = MediaQuery.of(context).size;
   }
@@ -320,6 +322,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
 
   _buildCharts() {
     return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
       child: StreamBuilder(
         stream: _homeBloc.timelineStream,
         builder: (context, snapshot) {
@@ -342,6 +345,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                   barGroupingType: charts.BarGroupingType.stacked,
                   domainAxis: charts.AxisSpec<String>(
                       renderSpec: charts.NoneRenderSpec()),
+                  behaviors: [charts.SeriesLegend()],
                   // hide y axis
                 );
         },
@@ -352,24 +356,24 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   List<charts.Series<DailyStats, String>> _createData(List<DailyStats> data) {
     return [
       charts.Series<DailyStats, String>(
-        id: 'Desktop',
+        id: tr('infected'),
         domainFn: (DailyStats sales, _) => sales.date,
         measureFn: (DailyStats sales, _) => sales.cases,
         colorFn: (DailyStats sales, _) => charts.Color(r: 128, g: 0, b: 128),
         data: data,
       ),
       charts.Series<DailyStats, String>(
-        id: 'Tablet',
-        domainFn: (DailyStats sales, _) => sales.date,
-        measureFn: (DailyStats sales, _) => sales.deaths,
-        colorFn: (DailyStats sales, _) => charts.Color(r: 255, g: 0, b: 0),
-        data: data,
-      ),
-      charts.Series<DailyStats, String>(
-        id: 'Mobile',
+        id: tr('recovered'),
         domainFn: (DailyStats sales, _) => sales.date,
         measureFn: (DailyStats sales, _) => sales.recovered,
         colorFn: (DailyStats sales, _) => charts.Color(r: 0, g: 255, b: 0),
+        data: data,
+      ),
+      charts.Series<DailyStats, String>(
+        id: tr('fatal'),
+        domainFn: (DailyStats sales, _) => sales.date,
+        measureFn: (DailyStats sales, _) => sales.deaths,
+        colorFn: (DailyStats sales, _) => charts.Color(r: 255, g: 0, b: 0),
         data: data,
       ),
     ];

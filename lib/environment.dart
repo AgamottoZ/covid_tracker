@@ -23,6 +23,10 @@ class Environment {
 
   String get selectedCountryCode => _selectedCountryCode;
 
+  String _selectedCountryCode3;
+
+  String get selectedCountryCode3 => _selectedCountryCode3;
+
   init() async {
     _sharedPrefs = await SharedPreferences.getInstance();
     getConfig();
@@ -34,22 +38,24 @@ class Environment {
     _isVnese = _sharedPrefs.get(LOCALE_KEY) ?? true;
     _selectedCountryCode =
         _sharedPrefs.get(COUNTRY_CODE_KEY) ?? countryList.first.isoCode;
+    _selectedCountryCode3 =
+        _sharedPrefs.get(COUNTRY_CODE3_KEY) ?? countryList.first.iso3Code;
   }
 
   setTheme(bool lightTheme) async {
     _isLight = lightTheme;
     await _sharedPrefs.setBool(THEME_KEY, lightTheme);
-    getConfig();
   }
 
   setLocale(bool isVnese) async {
     _isVnese = isVnese;
     await _sharedPrefs.setBool(LOCALE_KEY, isVnese);
-    getConfig();
   }
 
-  setCountrySelection(String countryCode) async {
+  setCountrySelection(String countryCode, String countryCode3) async {
     _selectedCountryCode = countryCode;
     await _sharedPrefs.setString(COUNTRY_CODE_KEY, countryCode);
+    _selectedCountryCode3 = countryCode3;
+    await _sharedPrefs.setString(COUNTRY_CODE3_KEY, countryCode3);
   }
 }
