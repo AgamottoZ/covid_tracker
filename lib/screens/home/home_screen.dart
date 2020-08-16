@@ -204,19 +204,15 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
       width: _screenSize.width,
       height: _screenSize.height * 0.47,
       child: Swiper(
-        itemCount: 3,
+        itemCount: 2,
         loop: false,
         itemBuilder: (context, index) {
           switch (index) {
-            case 0:
-              return _buildGeneralStats();
             case 1:
               return _buildCharts();
-            case 2:
+            case 0:
             default:
-              return Container(
-                color: UIColors.green,
-              );
+              return _buildGeneralStats();
           }
         },
       ),
