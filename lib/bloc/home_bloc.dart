@@ -1,4 +1,3 @@
-import 'package:covid_tracker/environment.dart';
 import 'package:covid_tracker/injection.dart';
 import 'package:covid_tracker/models/daily_stats.dart';
 import 'package:covid_tracker/models/models.dart';
@@ -7,7 +6,6 @@ import 'package:rxdart/rxdart.dart';
 
 class HomeBloc {
   final repository = getIt.get<Repository>();
-  final _env = getIt.get<Environment>();
 
   final BehaviorSubject _statSubject = BehaviorSubject<Stats>();
 
