@@ -3,7 +3,6 @@ import 'package:covid_tracker/color.dart';
 import 'package:covid_tracker/injection.dart';
 import 'package:covid_tracker/models/daily_stats.dart';
 import 'package:covid_tracker/models/stats.dart';
-import 'package:covid_tracker/screens/home/charts/line_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -19,6 +18,7 @@ import 'package:covid_tracker/bloc/home_bloc.dart';
 import 'package:covid_tracker/screens/home/widgets/index.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -171,7 +171,6 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   }
 
   Container _buildBannerText() {
-    print(_env.isVnese);
     return Container(
       width: _screenSize.width * 0.5,
       height: 100,
@@ -317,8 +316,9 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
     );
   }
 
+  List<charts.Series> seriesList;
+
   _buildCharts() {
-    print("YEP");
     return Container(
       child: StreamBuilder(
         stream: _homeBloc.timelineStream,
@@ -327,23 +327,52 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
           if (snapshot.hasData) {
             _data = snapshot.data;
           }
-          return Column(
-            children: <Widget>[
-              ChartBuilder(
-                option: lineChartOption(
-                  dates: _data?.map((e) => e.date)?.toList() ?? [],
-                  confirmed: _data?.map((e) => e.cases)?.toList() ?? [],
-                  deaths: _data?.map((e) => e.deaths)?.toList() ?? [],
-                  recovered: _data?.map((e) => e.recovered)?.toList() ?? [],
-                ),
-                width: _screenSize.width * 0.8,
-                height: _screenSize.height * 0.45,
-              )
-            ],
-          );
+          return _data == null
+              ? Shimmer.fromColors(
+                  baseColor: Colors.grey,
+                  highlightColor: Color(0xff4F4F4),
+                  child: Container(
+                    width: _screenSize.width * 0.9,
+                    color: Colors.black54,
+                  ),
+                )
+              : charts.BarChart(
+                  _createData(_data),
+                  animate: true,
+                  barGroupingType: charts.BarGroupingType.stacked,
+                  domainAxis: charts.AxisSpec<String>(
+                      renderSpec: charts.NoneRenderSpec()),
+                  // hide y axis
+                );
         },
       ),
     );
+  }
+
+  List<charts.Series<DailyStats, String>> _createData(List<DailyStats> data) {
+    return [
+      charts.Series<DailyStats, String>(
+        id: 'Desktop',
+        domainFn: (DailyStats sales, _) => sales.date,
+        measureFn: (DailyStats sales, _) => sales.cases,
+        colorFn: (DailyStats sales, _) => charts.Color(r: 128, g: 0, b: 128),
+        data: data,
+      ),
+      charts.Series<DailyStats, String>(
+        id: 'Tablet',
+        domainFn: (DailyStats sales, _) => sales.date,
+        measureFn: (DailyStats sales, _) => sales.deaths,
+        colorFn: (DailyStats sales, _) => charts.Color(r: 255, g: 0, b: 0),
+        data: data,
+      ),
+      charts.Series<DailyStats, String>(
+        id: 'Mobile',
+        domainFn: (DailyStats sales, _) => sales.date,
+        measureFn: (DailyStats sales, _) => sales.recovered,
+        colorFn: (DailyStats sales, _) => charts.Color(r: 0, g: 255, b: 0),
+        data: data,
+      ),
+    ];
   }
 
   Widget _buildBottomBanner() {
@@ -424,4 +453,12 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   }
 
   Future<void> _onRefresh() async {}
+}
+
+/// Sample ordinal data type.
+class OrdinalSales {
+  final String year;
+  final int sales;
+
+  OrdinalSales(this.year, this.sales);
 }

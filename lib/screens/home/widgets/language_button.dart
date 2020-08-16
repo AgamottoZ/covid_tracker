@@ -27,8 +27,9 @@ class _LanguageButtonState extends State<LanguageButton> {
         showModalBottomSheet(
           context: context,
           builder: (context) => Container(
-            height: 150,
+            height: 200,
             padding: EdgeInsets.all(10),
+            alignment: Alignment.center,
             child: ListWheelScrollView(
               itemExtent: 40,
               useMagnifier: true,

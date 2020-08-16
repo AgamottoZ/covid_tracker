@@ -3,7 +3,6 @@ import 'package:covid_tracker/injection.dart';
 import 'package:covid_tracker/models/daily_stats.dart';
 import 'package:covid_tracker/models/models.dart';
 import 'package:covid_tracker/repository/repository.dart';
-import 'package:covid_tracker/utils/constants.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeBloc {
@@ -36,7 +35,14 @@ class HomeBloc {
   }
 
   Future getGlobalTimeline() async {
+    _timelineSubject.add(null);
     return repository.getGlobalTimeline()
+      ..then((data) => _timelineSubject.add(data.data));
+  }
+
+  Future getCountryTimeline(String countryCode3) async {
+    _timelineSubject.add(null);
+    return repository.getCountryTimeline(countryCode3)
       ..then((data) => _timelineSubject.add(data.data));
   }
 }

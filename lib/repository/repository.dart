@@ -60,7 +60,7 @@ class Repository {
           await apiClient.dio.get('${TIMELINE_URL}country/$countryCode3');
       if (result.statusCode == 200) {
         return ResponseResult(
-            data: List<DailyStats>.from(result.data['result']
+            data: List<DailyStats>.from(result.data['result'].entries
                 .map((element) => DailyStats.fromJson(element))));
       }
       return ResponseResult.fromError(result.statusMessage);

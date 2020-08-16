@@ -19,6 +19,7 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
   final Environment _env = getIt.get<Environment>();
   HomeBloc _homeBloc;
   String _selectedCountryCode;
+  String _selectedCountryCode3;
   Size _screenSize;
 
   @override
@@ -111,8 +112,10 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
                 useMagnifier: true,
                 magnification: 1.3,
                 controller: _scrollController,
-                onSelectedItemChanged: (index) => setState(
-                    () => _selectedCountryCode = countryList[index].isoCode),
+                onSelectedItemChanged: (index) => setState(() {
+                  _selectedCountryCode = countryList[index].isoCode;
+                  _selectedCountryCode3 = countryList[index].iso3Code;
+                }),
                 children: List<Widget>.generate(
                   countryList.length,
                   (index) => Container(
@@ -132,11 +135,13 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
             ),
             GestureDetector(
               onTap: () async {
-                await _env.setCountrySelection(_selectedCountryCode);
                 if (_selectedCountryCode == GLOBAL_COUNTRY_CODE) {
                   _homeBloc.getGlobalStats();
+                  _homeBloc.getGlobalTimeline();
                 } else {
+                  print(_selectedCountryCode3);
                   _homeBloc.getCountryStats(_selectedCountryCode);
+                  _homeBloc.getCountryTimeline(_selectedCountryCode3);
                 }
                 Navigator.of(context).pop();
               },
