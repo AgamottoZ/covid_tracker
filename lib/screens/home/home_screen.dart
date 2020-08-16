@@ -18,6 +18,7 @@ import 'package:covid_tracker/utils/mixins.dart';
 import 'package:covid_tracker/bloc/home_bloc.dart';
 import 'package:covid_tracker/screens/home/widgets/index.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -82,6 +83,14 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   }
 
   @override
+  initState() {
+    super.initState();
+    if (mounted) {
+      _startTimer();
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _homeBloc = Provider.of<HomeBloc>(context);
@@ -104,7 +113,6 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
 
   @override
   Widget build(BuildContext context) {
-    _startTimer();
     logger.v(context.locale.languageCode);
     return Material(
       child: RefreshIndicator(
@@ -163,25 +171,26 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   }
 
   Container _buildBannerText() {
+    print(_env.isVnese);
     return Container(
       width: _screenSize.width * 0.5,
       height: 100,
+      padding: EdgeInsets.only(
+          left: (context.locale.languageCode != LOCALES.first) ? 0 : 10),
       alignment: Alignment.center,
       child: RichText(
         text: TextSpan(
           style: GoogleFonts.montserrat(fontSize: 28, color: Colors.white),
           children: [
             TextSpan(text: tr('slogan')),
-            TextSpan(text: '\n'),
-            if (!_env.isVnese) TextSpan(text: tr('slogan2')),
-            if (!_env.isVnese) TextSpan(text: '\n'),
-            if (!_env.isVnese)
+            if (context.locale.languageCode != LOCALES.first)
               TextSpan(
-                text: tr('together'),
+                text: 'Together.',
                 style: GoogleFonts.montserrat(
-                    fontSize: 30,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Colors.white,
+                ),
               )
           ],
         ),
@@ -218,6 +227,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
       stream: _homeBloc.statStream,
       builder: (context, snapshot) {
         Stats _stats;
+        var _loading = snapshot.data == null;
         if (snapshot.hasData) {
           _stats = snapshot.data;
         }
@@ -244,16 +254,16 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                   }
                 }
                 return _buildStatisticItem(
-                  index,
-                  data, //! MOCKING
-                );
+                    index,
+                    data, //! MOCKING
+                    _loading);
               }),
         );
       },
     );
   }
 
-  Container _buildStatisticItem(int index, int amount) {
+  Container _buildStatisticItem(int index, int amount, bool _loading) {
     var _color;
     switch (index) {
       case 0:
@@ -282,13 +292,23 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                   fontSize: 25,
                 ),
               ),
-              Text(
-                NumberFormat.compact().format(amount),
-                style: GoogleFonts.montserrat(
-                  fontSize: 50,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              _loading
+                  ? Container(
+                      height: 50,
+                      width: 100,
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey,
+                        highlightColor: Colors.white,
+                        child: Container(),
+                      ),
+                    )
+                  : Text(
+                      NumberFormat.compact().format(amount),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ],
           ),
           Image.asset(_assetLinks[index]),

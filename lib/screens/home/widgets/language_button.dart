@@ -34,9 +34,10 @@ class _LanguageButtonState extends State<LanguageButton> {
               useMagnifier: true,
               magnification: 1.2,
               controller: _scrollController,
-              onSelectedItemChanged: (index) {
+              onSelectedItemChanged: (index) async {
+                await _env
+                    .setLocale(context.locale.languageCode == LOCALES.first);
                 context.locale = Locale(LOCALES[index]);
-                _env.setLocale(context.locale.languageCode == LOCALES.first);
               },
               children: List<Widget>.generate(
                 COUNTRIES.length,
