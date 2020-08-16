@@ -1,4 +1,3 @@
-
 class Country {
   final String isoCode;
   final String phoneCode;
@@ -11,9 +10,9 @@ class Country {
 final List<Country> countryList = [
   Country(
     isoCode: "Global",
-    phoneCode: "--",
+    phoneCode: "Global",
     name: "Global",
-    iso3Code: "--",
+    iso3Code: "Global",
   ),
   Country(
     isoCode: "VN",

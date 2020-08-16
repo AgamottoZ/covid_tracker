@@ -19,11 +19,13 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
   final Environment _env = getIt.get<Environment>();
   HomeBloc _homeBloc;
   String _selectedCountryCode;
+  String _selectedCountryCode3;
   Size _screenSize;
 
   @override
   void initState() {
     _selectedCountryCode = _env.selectedCountryCode;
+    _selectedCountryCode3 = _env.selectedCountryCode3;
     super.initState();
   }
 
@@ -46,7 +48,6 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
         initialItem: countryList.indexOf(countryList.firstWhere(
             (element) => element.isoCode == _selectedCountryCode,
             orElse: () => null)));
-
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () => _onTapButton(),
@@ -112,8 +113,10 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
                 useMagnifier: true,
                 magnification: 1.3,
                 controller: _scrollController,
-                onSelectedItemChanged: (index) =>
-                    _selectedCountryCode = countryList[index].isoCode,
+                onSelectedItemChanged: (index) => setState(() {
+                  _selectedCountryCode = countryList[index].isoCode;
+                  _selectedCountryCode3 = countryList[index].iso3Code;
+                }),
                 children: List<Widget>.generate(
                   countryList.length,
                   (index) => Container(
@@ -132,11 +135,15 @@ class _CountrySelectButtonState extends State<CountrySelectButton> {
               ),
             ),
             GestureDetector(
-              onTap: () {
+              onTap: () async {
+                await _env.setCountrySelection(
+                    _selectedCountryCode, _selectedCountryCode3);
                 if (_selectedCountryCode == GLOBAL_COUNTRY_CODE) {
                   _homeBloc.getGlobalStats();
+                  _homeBloc.getGlobalTimeline();
                 } else {
                   _homeBloc.getCountryStats(_selectedCountryCode);
+                  _homeBloc.getCountryTimeline(_selectedCountryCode3);
                 }
                 Navigator.of(context).pop();
               },

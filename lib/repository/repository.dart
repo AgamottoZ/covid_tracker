@@ -1,12 +1,14 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:covid_tracker/models/daily_stats.dart';
 import 'package:covid_tracker/models/models.dart';
 import 'package:covid_tracker/utils/utils.dart';
 
 class Repository {
   APIClient apiClient;
+  Firestore fireStore;
 
-  Repository(this.apiClient);
+  Repository(this.apiClient, this.fireStore);
 
   Future<ResponseResult<Stats>> getGlobalStats() async {
     try {
@@ -60,12 +62,31 @@ class Repository {
           await apiClient.dio.get('${TIMELINE_URL}country/$countryCode3');
       if (result.statusCode == 200) {
         return ResponseResult(
-            data: List<DailyStats>.from(result.data['result']
+            data: List<DailyStats>.from(result.data['result'].entries
                 .map((element) => DailyStats.fromJson(element))));
       }
       return ResponseResult.fromError(result.statusMessage);
     } catch (error) {
       logger.v('Error - $error');
+      return ResponseResult.fromError(error);
+    }
+  }
+
+  //! Firestore Collection Query
+  Future<ResponseResult<List<Tip>>> getHomeTips() async {
+    try {
+      QuerySnapshot _query = await fireStore.collection('tips').getDocuments();
+      var _docs =
+          List<Tip>.from(_query.documents.map((doc) => Tip.fromJson(doc.data)));
+      if (_docs != null) {
+        return ResponseResult(
+          state: ResponseState.SUCCESS,
+          data: _docs,
+        );
+      }
+      return null;
+    } catch (error) {
+      logger.v('Error - getMainHomeApp - $error');
       return ResponseResult.fromError(error);
     }
   }

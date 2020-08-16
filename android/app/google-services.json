@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "466529168617",
+    "firebase_url": "https://covid-tracker-12f2a.firebaseio.com",
+    "project_id": "covid-tracker-12f2a",
+    "storage_bucket": "covid-tracker-12f2a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:466529168617:android:68d1b598ff79a8b1ea1478",
+        "android_client_info": {
+          "package_name": "com.nogicoder.covid_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "466529168617-ejfrhm2g02vav3689nnms569udfsrc9d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcQ6G8RLu8_6kSx1XdK1QzELSe128o0Pg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "466529168617-ejfrhm2g02vav3689nnms569udfsrc9d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -22,20 +22,23 @@ class _LanguageButtonState extends State<LanguageButton> {
     );
 
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () {
         showModalBottomSheet(
           context: context,
           builder: (context) => Container(
-            height: 150,
+            height: 200,
             padding: EdgeInsets.all(10),
+            alignment: Alignment.center,
             child: ListWheelScrollView(
               itemExtent: 40,
               useMagnifier: true,
               magnification: 1.2,
               controller: _scrollController,
-              onSelectedItemChanged: (index) {
+              onSelectedItemChanged: (index) async {
+                await _env
+                    .setLocale(context.locale.languageCode == LOCALES.first);
                 context.locale = Locale(LOCALES[index]);
-                _env.setLocale(context.locale.languageCode == LOCALES.first);
               },
               children: List<Widget>.generate(
                 COUNTRIES.length,
@@ -55,8 +58,8 @@ class _LanguageButtonState extends State<LanguageButton> {
         );
       },
       child: Container(
-        width: 45,
-        height: 25,
+        width: 50,
+        height: 28,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),

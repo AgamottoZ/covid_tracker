@@ -3,7 +3,6 @@ import 'package:covid_tracker/injection.dart';
 import 'package:covid_tracker/models/daily_stats.dart';
 import 'package:covid_tracker/models/models.dart';
 import 'package:covid_tracker/repository/repository.dart';
-import 'package:covid_tracker/utils/constants.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeBloc {
@@ -24,19 +23,30 @@ class HomeBloc {
   }
 
   Future getGlobalStats() async {
-    await _env.setCountrySelection(GLOBAL_COUNTRY_CODE);
+    _statSubject.add(null);
     return repository.getGlobalStats()
       ..then((data) => _statSubject.add(data.data));
   }
 
   Future getCountryStats(String countryCode) async {
-    await _env.setCountrySelection(countryCode);
+    _statSubject.add(null);
     return repository.getCountryStats(countryCode)
       ..then((data) => _statSubject.add(data.data));
   }
 
   Future getGlobalTimeline() async {
+    _timelineSubject.add(null);
     return repository.getGlobalTimeline()
       ..then((data) => _timelineSubject.add(data.data));
+  }
+
+  Future getCountryTimeline(String countryCode3) async {
+    _timelineSubject.add(null);
+    return repository.getCountryTimeline(countryCode3)
+      ..then((data) => _timelineSubject.add(data.data));
+  }
+
+  Future<ResponseResult<List<Tip>>> getHomeTips() async {
+    return repository.getHomeTips();
   }
 }

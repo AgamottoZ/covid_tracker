@@ -2,8 +2,9 @@ import 'dart:async';
 import 'package:covid_tracker/color.dart';
 import 'package:covid_tracker/injection.dart';
 import 'package:covid_tracker/models/daily_stats.dart';
+import 'package:covid_tracker/models/models.dart';
+import 'package:covid_tracker/models/response_result.dart';
 import 'package:covid_tracker/models/stats.dart';
-import 'package:covid_tracker/screens/home/charts/line_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -18,6 +19,8 @@ import 'package:covid_tracker/utils/mixins.dart';
 import 'package:covid_tracker/bloc/home_bloc.dart';
 import 'package:covid_tracker/screens/home/widgets/index.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -28,6 +31,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   HomeBloc _homeBloc;
   final _env = getIt.get<Environment>();
+  bool _isVnese = false;
 
   StreamSubscription _subCurrentTab;
   Size _screenSize;
@@ -52,7 +56,8 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
           context: context,
           barrierDismissible: false,
           builder: (BuildContext dialogContext) {
-            Future.delayed(Duration(seconds: 2), ()=> Navigator.of(context).pop());
+            Future.delayed(
+                Duration(seconds: 2), () => Navigator.of(context).pop());
             return Stack(
               alignment: AlignmentDirectional.center,
               children: <Widget>[
@@ -81,14 +86,24 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   }
 
   @override
+  initState() {
+    super.initState();
+    if (mounted) {
+      _startTimer();
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     _homeBloc = Provider.of<HomeBloc>(context);
     if (_env.selectedCountryCode == GLOBAL_COUNTRY_CODE) {
       _homeBloc.getGlobalStats();
       _homeBloc.getGlobalTimeline();
     } else {
       _homeBloc.getCountryStats(_env.selectedCountryCode);
+      _homeBloc.getCountryTimeline(_env.selectedCountryCode3);
     }
     _screenSize = MediaQuery.of(context).size;
   }
@@ -103,8 +118,8 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
 
   @override
   Widget build(BuildContext context) {
-    _startTimer();
     logger.v(context.locale.languageCode);
+    _isVnese = context.locale.languageCode == LOCALES.first;
     return Material(
       child: RefreshIndicator(
         onRefresh: _onRefresh,
@@ -131,28 +146,28 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
         children: <Widget>[
           Container(
             width: _screenSize.width,
-            height: _screenSize.height * 0.33,
+            height: _screenSize.height * 0.3,
             child: CustomPaint(
               painter: CurvePainter(),
             ),
           ),
-          Positioned(
-            left: 30,
-            top: 60,
-            child: _buildBannerText(),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildBannerText(),
+                Image.asset('assets/images/top_banner.png'),
+              ],
+            ),
           ),
           Positioned(
             top: 35,
-            right: 10,
-            child: Image.asset('assets/images/top_banner.png'),
-          ),
-          Positioned(
-            top: 30,
             right: 5,
             child: LanguageButton(),
           ),
           Positioned(
-            top: _screenSize.height * 0.26,
+            top: _screenSize.height * 0.24,
             left: _screenSize.width / 2 - 50,
             child: CountrySelectButton(),
           )
@@ -164,21 +179,22 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   Container _buildBannerText() {
     return Container(
       width: _screenSize.width * 0.5,
+      height: 100,
+      padding: EdgeInsets.only(left: _isVnese ? 10 : 0),
+      alignment: Alignment.center,
       child: RichText(
         text: TextSpan(
           style: GoogleFonts.montserrat(fontSize: 28, color: Colors.white),
           children: [
             TextSpan(text: tr('slogan')),
-            TextSpan(text: '\n'),
-            if (!_env.isVnese) TextSpan(text: tr('slogan2')),
-            if (!_env.isVnese) TextSpan(text: '\n'),
-            if (!_env.isVnese)
+            if (!_isVnese)
               TextSpan(
-                text: tr('together'),
+                text: 'Together.',
                 style: GoogleFonts.montserrat(
-                    fontSize: 30,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Colors.white,
+                ),
               )
           ],
         ),
@@ -191,18 +207,15 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
       width: _screenSize.width,
       height: _screenSize.height * 0.47,
       child: Swiper(
-        itemCount: 3,
+        itemCount: 2,
+        loop: false,
         itemBuilder: (context, index) {
           switch (index) {
-            case 0:
-              return _buildGeneralStats();
             case 1:
               return _buildCharts();
-            case 2:
+            case 0:
             default:
-              return Container(
-                color: UIColors.green,
-              );
+              return _buildGeneralStats();
           }
         },
       ),
@@ -214,6 +227,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
       stream: _homeBloc.statStream,
       builder: (context, snapshot) {
         Stats _stats;
+        var _loading = snapshot.data == null;
         if (snapshot.hasData) {
           _stats = snapshot.data;
         }
@@ -221,7 +235,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
         return Container(
           child: ListView.builder(
               physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 50),
+              padding: EdgeInsets.symmetric(horizontal: 45),
               shrinkWrap: true,
               itemCount: _titles.length,
               itemBuilder: (context, index) {
@@ -240,16 +254,16 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                   }
                 }
                 return _buildStatisticItem(
-                  index,
-                  data, //! MOCKING
-                );
+                    index,
+                    data, //! MOCKING
+                    _loading);
               }),
         );
       },
     );
   }
 
-  Container _buildStatisticItem(int index, int amount) {
+  Container _buildStatisticItem(int index, int amount, bool _loading) {
     var _color;
     switch (index) {
       case 0:
@@ -278,13 +292,23 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                   fontSize: 25,
                 ),
               ),
-              Text(
-                NumberFormat.compact().format(amount),
-                style: GoogleFonts.montserrat(
-                  fontSize: 50,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              _loading
+                  ? Shimmer.fromColors(
+                      baseColor: Colors.grey,
+                      highlightColor: Color(0xff4F4F4),
+                      child: Container(
+                        height: 60,
+                        width: 150,
+                        color: Colors.black54,
+                      ),
+                    )
+                  : Text(
+                      NumberFormat.compact().format(amount),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ],
           ),
           Image.asset(_assetLinks[index]),
@@ -293,8 +317,11 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
     );
   }
 
+  List<charts.Series> seriesList;
+
   _buildCharts() {
     return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
       child: StreamBuilder(
         stream: _homeBloc.timelineStream,
         builder: (context, snapshot) {
@@ -302,23 +329,53 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
           if (snapshot.hasData) {
             _data = snapshot.data;
           }
-          return Column(
-            children: <Widget>[
-              ChartBuilder(
-                option: lineChartOption(
-                  dates: _data?.map((e) => e.date)?.toList() ?? [],
-                  confirmed: _data?.map((e) => e.cases)?.toList() ?? [],
-                  deaths: _data?.map((e) => e.deaths)?.toList() ?? [],
-                  recovered: _data?.map((e) => e.recovered)?.toList() ?? [],
-                ),
-                width: _screenSize.width * 0.8,
-                height: _screenSize.height * 0.45,
-              )
-            ],
-          );
+          return _data == null
+              ? Shimmer.fromColors(
+                  baseColor: Colors.grey,
+                  highlightColor: Color(0xff4F4F4),
+                  child: Container(
+                    width: _screenSize.width * 0.9,
+                    color: Colors.black54,
+                  ),
+                )
+              : charts.BarChart(
+                  _createData(_data),
+                  animate: true,
+                  barGroupingType: charts.BarGroupingType.stacked,
+                  domainAxis: charts.AxisSpec<String>(
+                      renderSpec: charts.NoneRenderSpec()),
+                  behaviors: [charts.SeriesLegend()],
+                  // hide y axis
+                );
         },
       ),
     );
+  }
+
+  List<charts.Series<DailyStats, String>> _createData(List<DailyStats> data) {
+    return [
+      charts.Series<DailyStats, String>(
+        id: tr('infected'),
+        domainFn: (DailyStats sales, _) => sales.date,
+        measureFn: (DailyStats sales, _) => sales.cases,
+        colorFn: (DailyStats sales, _) => charts.Color(r: 128, g: 0, b: 128),
+        data: data,
+      ),
+      charts.Series<DailyStats, String>(
+        id: tr('recovered'),
+        domainFn: (DailyStats sales, _) => sales.date,
+        measureFn: (DailyStats sales, _) => sales.recovered,
+        colorFn: (DailyStats sales, _) => charts.Color(r: 0, g: 255, b: 0),
+        data: data,
+      ),
+      charts.Series<DailyStats, String>(
+        id: tr('fatal'),
+        domainFn: (DailyStats sales, _) => sales.date,
+        measureFn: (DailyStats sales, _) => sales.deaths,
+        colorFn: (DailyStats sales, _) => charts.Color(r: 255, g: 0, b: 0),
+        data: data,
+      ),
+    ];
   }
 
   Widget _buildBottomBanner() {
@@ -339,80 +396,66 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
             children: <Widget>[
               Image.asset('assets/images/man.png'),
               Container(
-                width: _screenSize.width * 0.55,
+                width: _screenSize.width * 0.6,
                 height: 90,
-                padding: EdgeInsets.all(5),
+                padding: EdgeInsets.symmetric(vertical: 5),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Stack(
-                  alignment: AlignmentDirectional.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Positioned(
-                      top: 0,
-                      left: 2,
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        child: FlareActor(
-                          'assets/animation/bulb.flr',
-                          animation: 'Loop',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 8,
-                      left: 33,
-                      child: Text(
-                        tr('tip_question'),
-                        style: GoogleFonts.montserrat(
-                          color: Color(0xFF0E0B87),
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 13,
-                      top: 32,
-                      child: Container(
-                        width: 210,
-                        height: 40,
-                        child: Swiper(
-                          itemCount: 3,
-                          autoplay: true,
-                          loop: true,
-                          itemBuilder: (context, index) => Text(
-                            tr('tip$index'),
-                            style: GoogleFonts.montserrat(
-                              color: Color(0xFF0E0B87),
-                              fontSize: 14,
-                            ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          width: 32,
+                          height: 32,
+                          child: FlareActor(
+                            'assets/animation/bulb.flr',
+                            animation: 'Loop',
+                            fit: BoxFit.contain,
                           ),
                         ),
-                      ),
+                        Text(
+                          tr('tip_question'),
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFF0E0B87),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-//                    Positioned(
-//                      bottom: 0,
-//                      child: SizedBox(
-//                        width: 35,
-//                        child: Row(
-//                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                          children: List<Widget>.generate(
-//                            3,
-//                            (index) => CircleAvatar(
-//                              minRadius: 4,
-//                              maxRadius: 4,
-//                              backgroundColor: _currentIndex == index
-//                                  ? UIColors.purple
-//                                  : Colors.grey[300],
-//                            ),
-//                          ),
-//                        ),
-//                      ),
-//                    )
+                    FutureBuilder<ResponseResult<List<Tip>>>(
+                      future: _homeBloc.getHomeTips(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Container();
+                        }
+                        var _tips = snapshot.data.data;
+                        return Container(
+                          width: 210,
+                          height: 40,
+                          padding: EdgeInsets.only(left: 5),
+                          child: Swiper(
+                            itemCount: _tips.length,
+                            autoplay: true,
+                            loop: true,
+                            itemBuilder: (context, index) => Text(
+                              _isVnese
+                                  ? _tips[index].text ?? ''
+                                  : _tips[index].textEn ?? '',
+                              style: GoogleFonts.montserrat(
+                                color: Color(0xFF0E0B87),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               )
@@ -423,5 +466,15 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
     );
   }
 
-  Future<void> _onRefresh() async {}
+  Future<void> _onRefresh() async {
+    if (_env.selectedCountryCode == GLOBAL_COUNTRY_CODE) {
+      _homeBloc.getGlobalStats();
+      _homeBloc.getGlobalTimeline();
+    } else {
+      _homeBloc.getCountryStats(_env.selectedCountryCode);
+      _homeBloc.getCountryTimeline(_env.selectedCountryCode3);
+    }
+  }
 }
+
+/// Sample
