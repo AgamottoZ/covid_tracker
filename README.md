@@ -1,16 +1,33 @@
-# covid_tracker
+# Covid Tracker
 
-A new Flutter project.
+A mobile application to help you keeping track of COVID-19 statistics based on countries.
 
-## Getting Started
+## Index
 
-This project is a starting point for a Flutter application.
+- [Introduction](#introduction)
+- [Features](#features)
+- [Technology](#technology)
+- [Setup](#setup)
 
-A few resources to get you started if this is your first Flutter project:
+## Introduction
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Covid Tracker allows users to track COVID-19 total cases, deaths and recovered cases across all countries in numbers and chart.  
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Features
+
+- Fetching realtime data from 2 sources: [thevirustracker.com](https://thevirustracker.com/) and [covidapi.info](https://covidapi.info/api/v1/).  
+- Fetching tips dynamically from Firestore to update users about daily tips.  
+- The app is available in English and Vietnamese.
+
+## Technology
+
+This app is built with Flutter v1.20.1 and Firebase.
+
+## Setup
+
+- Install Flutter v1.20.1 ([Tutorial](https://flutter.dev/docs/get-started/install))
+- Run `flutter pub get` inside the app directory
+- Connect to your phone or run a simulator
+- Run `flutter run` to start building and running the app
+
+Thank you for trying this app! All requests and questions please send to me directly through: [nogicoder@gmail.com](nogicoder@gmail.com)
