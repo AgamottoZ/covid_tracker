@@ -146,7 +146,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
         children: <Widget>[
           Container(
             width: _screenSize.width,
-            height: _screenSize.height * 0.3,
+            height: _screenSize.height * 0.33,
             child: CustomPaint(
               painter: CurvePainter(),
             ),
@@ -167,7 +167,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
             child: LanguageButton(),
           ),
           Positioned(
-            top: _screenSize.height * 0.24,
+            top: _screenSize.height * 0.27,
             left: _screenSize.width / 2 - 50,
             child: CountrySelectButton(),
           )
@@ -178,7 +178,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
 
   Container _buildBannerText() {
     return Container(
-      width: _screenSize.width * 0.5,
+      width: _screenSize.width * 0.46,
       height: 100,
       padding: EdgeInsets.only(left: _isVnese ? 10 : 0),
       alignment: Alignment.center,
