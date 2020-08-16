@@ -24,11 +24,13 @@ class HomeBloc {
   }
 
   Future getGlobalStats() async {
+    _statSubject.add(null);
     return repository.getGlobalStats()
       ..then((data) => _statSubject.add(data.data));
   }
 
   Future getCountryStats(String countryCode) async {
+    _statSubject.add(null);
     return repository.getCountryStats(countryCode)
       ..then((data) => _statSubject.add(data.data));
   }

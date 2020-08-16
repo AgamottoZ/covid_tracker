@@ -293,13 +293,13 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                 ),
               ),
               _loading
-                  ? Container(
-                      height: 50,
-                      width: 100,
-                      child: Shimmer.fromColors(
-                        baseColor: Colors.grey,
-                        highlightColor: Colors.white,
-                        child: Container(),
+                  ? Shimmer.fromColors(
+                      baseColor: Colors.grey,
+                      highlightColor: Color(0xff4F4F4),
+                      child: Container(
+                        height: 60,
+                        width: 150,
+                        color: Colors.black54,
                       ),
                     )
                   : Text(
@@ -318,6 +318,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
   }
 
   _buildCharts() {
+    print("YEP");
     return Container(
       child: StreamBuilder(
         stream: _homeBloc.timelineStream,
@@ -376,7 +377,6 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        SizedBox(width: 5),
                         Container(
                           width: 32,
                           height: 32,
@@ -399,6 +399,7 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                     Container(
                       width: 210,
                       height: 40,
+                      padding: EdgeInsets.only(left: 5),
                       child: Swiper(
                         itemCount: 3,
                         autoplay: true,

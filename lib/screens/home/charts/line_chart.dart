@@ -73,20 +73,20 @@ String lineChartOption(
   //       }
 
   //       ''';
-  return '''
- option = {
-   xAxis: {
-       type: 'category',
-       data: ['21/01/2020', '22/01/2020', '23/01/2020']
-   },
-   yAxis: {
-       type: 'value'
-   },
-   series: [{
-       data: [820, 932, 901, 934, 1290, 1330, 1320],
-       type: 'line'
-   }]
- };                                                                                                                                                                                                              
+  return '''option = {
+    xAxis: {
+        type: 'category',
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    },
+    yAxis: {
+        type: 'value'
+    },
+    series: [{
+        data: [820, 932, 901, 934, 1290, 1330, 1320],
+        type: 'line',
+        smooth: true
+    }]
+};                                                                                                                                                                                                 
  ''';
 }
 //,
