@@ -344,7 +344,13 @@ class HomeScreenState extends State<HomeScreen> with ScrollControllerMixin {
                   barGroupingType: charts.BarGroupingType.stacked,
                   domainAxis: charts.AxisSpec<String>(
                       renderSpec: charts.NoneRenderSpec()),
-                  behaviors: [charts.SeriesLegend()],
+                  behaviors: [
+                    charts.SeriesLegend(
+                      position: charts.BehaviorPosition.bottom,
+                      outsideJustification:
+                          charts.OutsideJustification.endDrawArea,
+                    )
+                  ],
                   // hide y axis
                 );
         },
