@@ -1,5 +1,5 @@
 name: covid_tracker
-description: A new Flutter project.
+description: An application to help users tracking Covid-19 statistics by countries
 version: 1.0.0+1
 
 environment:
